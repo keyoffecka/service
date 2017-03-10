@@ -1,0 +1,9 @@
+case "$command_name" in
+  start)
+    echo "Unmounting file systems"
+    umount -a -d -r -t notmpfs,nosysfs,nodevtmpfs,noproc,nodevpts
+    success "$?"
+    
+    mount -o remount,ro /
+  ;;
+esac

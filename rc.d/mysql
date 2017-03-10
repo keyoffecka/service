@@ -1,0 +1,119 @@
+PIDFILE=/run/mysqld/`/bin/hostname`.pid
+PREFIX=/opt/mysql-5.7.10
+
+function mysql__stop_mysql() {
+  echo "Stopping MySQL..."
+      
+  local __ret_val="0"
+  
+  if [ -r "$PIDFILE" ] ; then
+    local __pid="$(cat $PIDFILE)"
+    if ps --pid $__pid | grep -q mysqld ; then
+      kill -s 15 "$__pid"
+      __ret_val="$?"
+      
+      if [ "$__ret_val" == "0" ] ; then
+        local i=0
+
+        kill -s 0 $__pid 2>/dev/null
+        __ret_val="$?"
+        while [ \( "$i" -lt "$TRY" \) -a \( \( "$__ret_val" == "0" \) -o \( -f "$PIDFILE" \) \) ] ; do
+          sleep $TIMEOUT
+          kill -s 0 $__pid 2>/dev/null
+          __ret_val="$?"
+          i=$[i+1]
+        done
+        
+        if [ "$__ret_val" == "0" ] ; then
+          echo "Tried to stop MySQL, but it's still running"
+          __ret_val=14
+        else
+          __ret_val=0
+        fi
+      fi
+    else
+      rm -f "$PIDFILE"
+      if [ -f "$PIDFILE" ]; then
+        echo "MySQL wasn't running, but failed to delete orphan $PIDFILE"
+        __ret_val=-13
+      else
+        echo "$PIDFILE existed, but MySQL daemon wasn't running"
+        __ret_val=-12
+      fi
+    fi
+  else
+    echo "No $PIDFILE found"
+    __ret_val=-11
+  fi
+  
+  if [[ "$__ret_val" == "0" ]] ; then
+    unregister
+  fi
+      
+  success "$__ret_val"
+}
+
+function mysql__start_mysql() {
+  echo "Starting MySQL..."
+
+  # Make sure the mysql user can create a socket
+  mkdir -p `dirname $PIDFILE`
+  chown mysql:mysql `dirname $PIDFILE`
+  chmod 0775 `dirname $PIDFILE`
+
+  local __ret_val="0"
+  if [ -r "$PIDFILE" ] ; then
+    local __pid="$(cat $PIDFILE)"
+    if ps --pid "$__pid" | grep -q mysqld ; then
+      echo "MySQL $__pid is already running!"
+      __ret_val=-2
+    else
+      rm -f "$PIDFILE"
+      if [ -f "$PIDFILE" ]; then
+         echo "Failed to delete $PIDFILE"
+         __ret_val=-3
+      fi
+    fi
+  fi
+
+  if [ "$__ret_val" == "0" ] ; then
+    $PREFIX/bin/mysqld_safe --defaults-file=/etc/mysql/my.cnf --pid-file=$PIDFILE --user=mysql 2>&1 >/dev/null &
+
+    local i=0
+    while [ \( "$i" -lt "$TRY" \) -a \( ! -f "$PIDFILE" \) ] ; do
+      sleep $TIMEOUT
+      i=$[i+1]
+    done
+    
+    if [ -f "$PIDFILE" ] ; then
+      register `cat $PIDFILE`
+    else
+      echo "MySQL reported successful start, but $PIDFILE yet hasn't been created"
+      __ret_val=-1
+    fi
+  fi
+
+  success "$__ret_val"
+}
+
+case "$1" in
+  start)
+    mysql__start_mysql
+  ;;
+
+  stop)
+    mysql__stop_mysql
+  ;;
+
+  reload)
+    echo "Reloading MySQL daemon ..."
+    kill -s HUP  `cat ${PIDFILE}`
+    success "$?"
+  ;;
+
+  help)
+    echo "Usage: $0 {start|stop|reload|restart|status|help}"
+      
+    success
+  ;;
+esac

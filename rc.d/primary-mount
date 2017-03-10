@@ -1,0 +1,33 @@
+case "$command_name" in
+  start)
+    echo "Mounting essential file systems"
+    mount -t proc -o nosuid,noexec,nodev proc /proc
+    mount -t sysfs -o nosuid,noexec,nodev sysfs /sys
+    mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
+    mount -t tmpfs -o mode=1777,nosuid,noexec,nodev tmpfs /run
+
+    mount -t devtmpfs -o mode=0755,nosuid,noexec devtmpfs /dev
+
+    install -dm0777 -g 0 -o 5 /dev/pts
+    mount -o "mode=0620,gid=5,ptmxmode=0666" -t devpts devpts /dev/pts
+    chown -R :tty /dev/pts
+    chmod 0777 /dev/pts
+
+    chown :tty /dev/ptmx
+
+    mkdir -p /dev/shm
+    ln -sf /dev/shm /run/shm
+    chmod 1777 /dev/shm
+
+    echo "Reinitializing /dev/initctl"
+    if [ ! -e /dev/initctl ] ; then
+      mkfifo /dev/initctl
+    fi
+    kill -s SIGUSR1 1
+    
+    echo "Creating utmp"
+    touch /var/run/utmp
+    
+    success
+  ;;
+esac

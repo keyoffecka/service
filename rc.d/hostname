@@ -1,0 +1,7 @@
+case "$command_name" in
+  start)
+    echo "Setting the host name"
+    hostname "$(cat /etc/hostname)"
+    success "$?"
+  ;;
+esac

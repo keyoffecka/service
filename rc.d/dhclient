@@ -1,0 +1,13 @@
+source /etc/sysconfig/network
+
+case $command_name in
+  start)
+    dhclient -nw $NETWORK__IFACE -pf /run/dhclient
+    success "$?"
+    register "$(cat /run/dhclient)"
+  ;;
+  stop)
+    dhclient -x -pf /run/dhclient
+    success "$?"
+    unregister
+esac

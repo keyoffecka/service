@@ -1,0 +1,13 @@
+source /etc/sysconfig/modules
+
+case "$command_name" in
+  start)
+    echo "Loading kernel modules"
+    
+    for module in $MODULES__MODULES ; do
+      modprobe $module
+    done
+    
+    success
+  ;;
+esac

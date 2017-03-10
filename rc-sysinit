@@ -1,0 +1,12 @@
+kernel-console-log
+primary-mount
+fsck
+hostname
+remount-root
+logger
+udev
+mount
+tmp
+modules
+loopback
+

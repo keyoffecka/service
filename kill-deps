@@ -1,0 +1,13 @@
+X
+alsa
+mysql
+dbus
+dhclient
+wifi
+java
+keyboard
+
+loopback
+logger
+udev
+kernel-console-log

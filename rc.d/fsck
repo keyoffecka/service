@@ -1,0 +1,26 @@
+case "$command_name" in
+  start)
+    echo "Checking file systems"
+    fsck -T -A -a
+    success "$?"
+
+    if [ "$ret_val" != "0" ] ; then
+      echo "File systems with errors were found"
+
+      fsck -T -A -r -s
+      success "$?"
+    fi
+
+    if [ "$ret_val" != "0" ] ; then
+      if [ -a "$ret_val" == "1" ] ; then
+        echo "All errors were corrected"
+      else
+        echo "There were severe errors. Cannot continue."
+        reboot -f
+      fi
+    fi
+
+    success
+  ;;
+esac
+

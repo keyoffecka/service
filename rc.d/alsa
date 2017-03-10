@@ -1,0 +1,56 @@
+source /etc/sysconfig/alsa
+
+function alsa__do_check_ready() {
+  __ready=0
+  for dev in ${ALSA__DEVS[@]} ; do
+    if [ ! -e "$dev" ] ; then
+      __ready=-1
+      break;
+    fi
+  done
+  return $__ready
+}
+
+function alsa__check_ready() {
+  alsa__do_check_ready
+  local __ready="$?"
+
+  local i=0;
+  while [ "$i" -lt "$TRY" -a "$__ready" != "0" ] ; do
+    [ "$i" == "0" ] && echo "Waiting for devices to get ready"
+    sleep $TIMEOUT
+    alsa__do_check_ready
+    __ready="$?"
+    i=$[i+1]
+  done
+  
+  return "$__ready"
+}
+
+case "$command_name" in
+  start)
+    echo "Loading sound modules"
+    for alsa__module in ${ALSA__MODULES[@]} ; do
+      modprobe $alsa__module
+    done
+
+    echo "Restoring sound settings"
+    alsa__check_ready
+    success "$?"
+
+    if [ "$ret_val" == "0" ] ; then
+      alsactl restore
+      success "$?"
+      [ "$ret_val" == "0" ] && register
+    else
+      echo "Some of devices are still not ready";
+    fi
+  ;;
+  stop)
+    echo "Storing sound settings"
+    alsactl store
+    success "$?"
+  ;;
+esac
+
+

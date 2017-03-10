@@ -1,0 +1,15 @@
+case "$command_name" in
+  start)
+    echo "Cleaning up /tmp"
+
+    pushd /tmp >/dev/null
+    rm -fr *
+    rm -fr .* 2>/dev/null
+    popd >/dev/null
+
+    install -d -m 1777 /tmp/.ICE-unix
+    install -d -m 1777 /tmp/.X11-unix
+    
+    success
+  ;;
+esac

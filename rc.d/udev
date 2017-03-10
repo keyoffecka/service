@@ -1,0 +1,26 @@
+function udev_wait() {
+  local pid=$(pidof udevd 2>/dev/null)
+  if [ -n "$pid" ] ; then
+    check_process_running $pid
+  fi
+}
+
+case "$command_name" in
+  start)
+    echo "Setting up UDEV"
+    udevd --daemon
+
+    udevadm trigger --action=add    --type=subsystems
+    udevadm trigger --action=add    --type=devices
+    udevadm trigger --action=change --type=devices
+
+    udevadm settle
+    
+    success
+  ;;
+  stop)
+    udevadm control -e
+
+    udev__wait
+  ;;
+esac

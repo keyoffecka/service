@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Rebooting the system"
+    print_msg "Rebooting the system"
     reboot -f
   ;;
 esac

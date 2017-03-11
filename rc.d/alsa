@@ -17,7 +17,7 @@ function alsa__check_ready() {
 
   local i=0;
   while [ "$i" -lt "$TRY" -a "$__ready" != "0" ] ; do
-    [ "$i" == "0" ] && echo "Waiting for devices to get ready"
+    [ "$i" == "0" ] && print_msg "Waiting for devices to get ready"
     sleep $TIMEOUT
     alsa__do_check_ready
     __ready="$?"
@@ -29,12 +29,12 @@ function alsa__check_ready() {
 
 case "$command_name" in
   start)
-    echo "Loading sound modules"
+    print_msg "Loading sound modules"
     for alsa__module in ${ALSA__MODULES[@]} ; do
       modprobe $alsa__module
     done
 
-    echo "Restoring sound settings"
+    print_msg "Restoring sound settings"
     alsa__check_ready
     success "$?"
 
@@ -43,11 +43,11 @@ case "$command_name" in
       success "$?"
       [ "$ret_val" == "0" ] && register
     else
-      echo "Some of devices are still not ready";
+      print_msg "Some of devices are still not ready";
     fi
   ;;
   stop)
-    echo "Storing sound settings"
+    print_msg "Storing sound settings"
     alsactl store
     success "$?"
   ;;

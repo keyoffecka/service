@@ -7,7 +7,7 @@ function udev_wait() {
 
 case "$command_name" in
   start)
-    echo "Setting up UDEV"
+    print_msg "Setting up UDEV"
     udevd --daemon
 
     udevadm trigger --action=add    --type=subsystems

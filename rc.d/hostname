@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Setting the host name"
+    print_msg "Setting the host name"
     hostname "$(cat /etc/hostname)"
     success "$?"
   ;;

@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Remounting ROOT read-write"
+    print_msg "Remounting ROOT read-write"
     mount -o remount,rw /
     success "$?"
   ;;

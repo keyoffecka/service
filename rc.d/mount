@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Mounting remaining file systems"
+    print_msg "Mounting remaining file systems"
     mount -a
     success "$?"
   ;;

@@ -1,20 +1,22 @@
 source /etc/sysconfig/keyboard
 
+__keyboard_brightness="/sys/class/leds/asus::kbd_backlight/brightness"
+
 case "$command_name" in
   start)
-    echo "Highlighting the keboard"
+    print_msg "Highlighting the keboard"
     
     modprobe $KEYBOARD__MODULE
     
-    echo '3'>/sys/class/leds/asus::kbd_backlight/brightness
+    echo '3'>$__keyboard_brightness
     
     register
     success
   ;;
   stop)
-    echo "Unhighlighting the keboard"
+    print_msg "Unhighlighting the keboard"
 
-    echo '0'>/sys/class/leds/asus::kbd_backlight/brightness
+    echo '0'>$__keyboard_brightness
 
     unregister
     success

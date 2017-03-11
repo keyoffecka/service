@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Starting the logger"
+    print_msg "Starting the logger"
     rm -v /var/run/rsyslogd.pid 2>/dev/null
     rsyslogd -i /var/run/rsyslogd.pid
     success "$?"

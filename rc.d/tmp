@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Cleaning up /tmp"
+    print_msg "Cleaning up /tmp"
 
     pushd /tmp >/dev/null
     rm -fr *

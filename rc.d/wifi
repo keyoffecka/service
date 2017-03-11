@@ -2,7 +2,7 @@ source /etc/sysconfig/network
 
 case $command_name in
   start)
-    echo "Setting up WIFI"
+    print_msg "Setting up WIFI"
     modprobe $NETWORK__MODULE
     wpa_supplicant -W -B -i $NETWORK__IFACE -c $NETWORK__WPA_SUPPLICANT_CONFIG_FILE -P /run/wpa_supplicant
     success "$?"

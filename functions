@@ -1,0 +1,83 @@
+function print_msg() {
+  local msg="$1"
+  if [ "$PRINT_TO_TTY1" == "yes" ] ; then
+    echo "$msg" >${PRINT_TTY:-/dev/tty1}
+  else
+    echo "$msg"
+  fi
+}
+
+function register() {
+  if [ -z "${1:-}" ] ; then
+    touch "$SERVICE_RUN_DIR/$service_name"
+  else
+    echo "$1" > "$SERVICE_RUN_DIR/$service_name"
+  fi
+}
+
+function register_process_by_name() {
+  local __pid="`pidof "$1"`"
+  local __ret_val="0"
+  
+  local i=0
+  while [ "$i" -lt "$TRY" -a -z "$__pid" ] ; do
+    sleep $TIMEOUT
+    __pid="`pidof "$1"`"
+    __ret_val="$?"
+    i=$[i+1]
+  done
+
+  if [ -n "$__pid" ] ; then
+    print_msg "Found $__pid of $1 of $service_name"
+    register "$__pid"
+  else
+    __ret_val="-125"
+    print_msg "No process $1 found"
+  fi
+  
+  return $__ret_val
+}
+
+function unregister() {
+  rm "$SERVICE_RUN_DIR/$service_name"
+  return "$?"
+}
+
+function success() {
+  ret_val="${1:-0}"
+}
+
+function check_process_running() {
+  local __pid="$1"
+  
+  kill -s 0 "$__pid" 2>/dev/null
+  local __ret_val="$?"
+  local i="0"
+  while [ "$i" -lt "$TRY" -a "$__ret_val" == "0" ] ; do
+    sleep $TIMEOUT
+    kill -s 0 "$__pid" 2>/dev/null
+    __ret_val="$?"
+    i=$[i+1]
+  done
+  
+  return $__ret_val
+}
+
+function try_stop_process() {
+  local __signal="$1"
+  local __pid="$2"
+  
+  kill -s "$__signal" "$__pid" 2>/dev/null
+  kill -s 0 "$__pid" 2>/dev/null
+  local __ret_val="$?"
+  local i="0"
+  while [ "$i" -lt "$TRY" -a "$__ret_val" == "0" ] ; do
+    sleep $TIMEOUT
+    kill -s "$__signal" "$__pid" 2>/dev/null
+    kill -s 0 "$__pid" 2>/dev/null
+    __ret_val="$?"
+    i=$[i+1]
+  done
+  
+  return $__ret_val
+}

@@ -2,11 +2,13 @@ source /etc/sysconfig/network
 
 case $command_name in
   start)
+    print_msg "Starting the DHCP client"
     dhclient -nw $NETWORK__IFACE -pf /run/dhclient
     success "$?"
     register "$(cat /run/dhclient)"
   ;;
   stop)
+    print_msg "Stopping the DHCP client"
     dhclient -x -pf /run/dhclient
     success "$?"
     unregister

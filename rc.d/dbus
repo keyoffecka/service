@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Starting D-BUS daemon"
+    print_msg "Starting D-BUS daemon"
 
     mkdir -p /run/dbus
     rm /run/dbus/pid 2>/dev/null

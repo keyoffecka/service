@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Mounting essential file systems"
+    print_msg "Mounting essential file systems"
     mount -t proc -o nosuid,noexec,nodev proc /proc
     mount -t sysfs -o nosuid,noexec,nodev sysfs /sys
     mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc
@@ -19,13 +19,13 @@ case "$command_name" in
     ln -sf /dev/shm /run/shm
     chmod 1777 /dev/shm
 
-    echo "Reinitializing /dev/initctl"
+    print_msg "Reinitializing /dev/initctl"
     if [ ! -e /dev/initctl ] ; then
       mkfifo /dev/initctl
     fi
     kill -s SIGUSR1 1
     
-    echo "Creating utmp"
+    print_msg "Creating utmp"
     touch /var/run/utmp
     
     success

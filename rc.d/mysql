@@ -2,7 +2,7 @@ PIDFILE=/run/mysqld/`/bin/hostname`.pid
 PREFIX=/opt/mysql-5.7.10
 
 function mysql__stop_mysql() {
-  echo "Stopping MySQL..."
+  print_msg "Stopping MySQL"
       
   local __ret_val="0"
   
@@ -25,7 +25,7 @@ function mysql__stop_mysql() {
         done
         
         if [ "$__ret_val" == "0" ] ; then
-          echo "Tried to stop MySQL, but it's still running"
+          print_msg "Tried to stop MySQL, but it's still running"
           __ret_val=14
         else
           __ret_val=0
@@ -34,15 +34,15 @@ function mysql__stop_mysql() {
     else
       rm -f "$PIDFILE"
       if [ -f "$PIDFILE" ]; then
-        echo "MySQL wasn't running, but failed to delete orphan $PIDFILE"
+        print_msg "MySQL wasn't running, but failed to delete orphan $PIDFILE"
         __ret_val=-13
       else
-        echo "$PIDFILE existed, but MySQL daemon wasn't running"
+        print_msg "$PIDFILE existed, but MySQL daemon wasn't running"
         __ret_val=-12
       fi
     fi
   else
-    echo "No $PIDFILE found"
+    print_msg "No $PIDFILE found"
     __ret_val=-11
   fi
   
@@ -54,7 +54,7 @@ function mysql__stop_mysql() {
 }
 
 function mysql__start_mysql() {
-  echo "Starting MySQL..."
+  print_msg "Starting MySQL"
 
   # Make sure the mysql user can create a socket
   mkdir -p `dirname $PIDFILE`
@@ -65,12 +65,12 @@ function mysql__start_mysql() {
   if [ -r "$PIDFILE" ] ; then
     local __pid="$(cat $PIDFILE)"
     if ps --pid "$__pid" | grep -q mysqld ; then
-      echo "MySQL $__pid is already running!"
+      print_msg "MySQL $__pid is already running!"
       __ret_val=-2
     else
       rm -f "$PIDFILE"
       if [ -f "$PIDFILE" ]; then
-         echo "Failed to delete $PIDFILE"
+         print_msg "Failed to delete $PIDFILE"
          __ret_val=-3
       fi
     fi
@@ -88,7 +88,7 @@ function mysql__start_mysql() {
     if [ -f "$PIDFILE" ] ; then
       register `cat $PIDFILE`
     else
-      echo "MySQL reported successful start, but $PIDFILE yet hasn't been created"
+      print_msg "MySQL reported successful start, but $PIDFILE yet hasn't been created"
       __ret_val=-1
     fi
   fi
@@ -106,13 +106,13 @@ case "$1" in
   ;;
 
   reload)
-    echo "Reloading MySQL daemon ..."
+    print_msg "Reloading MySQL daemon"
     kill -s HUP  `cat ${PIDFILE}`
     success "$?"
   ;;
 
   help)
-    echo "Usage: $0 {start|stop|reload|restart|status|help}"
+    print_msg "Usage: $0 {start|stop|reload|restart|status|help}"
       
     success
   ;;

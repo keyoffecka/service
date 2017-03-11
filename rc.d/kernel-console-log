@@ -1,6 +1,6 @@
 case $1 in
   start)
-    echo "Stoping the kernel to log to the console (use SysLog to examine the kernel output)"
+    print_msg "Stopping the kernel to log to the console (use SysLog to examine the kernel output)"
     dmesg -n 1
     success
   ;;

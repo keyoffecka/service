@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Halting the system"
+    print_msg "Halting the system"
     poweroff -f -i -h
   ;;
 esac

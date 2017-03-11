@@ -1,6 +1,9 @@
 #!/usr/bin/bash
 
 source /etc/sysconfig/rc
+source $RC_DIR/functions
+
+export PRINT_TO_TTY1="yes"
 
 __curent_runlevel="$1"
 
@@ -14,7 +17,7 @@ function __start_them_all() {
     if [ -n "$line" ] ; then
       for process in $(ls $SERVICE_RUN_DIR -1) ; do
         if [ "$line" == "$process" ] ; then
-          $SERVICE $process status >/dev/null 2>&1
+          PRINT_TO_TTY1="no" $SERVICE $process status >/dev/null 2>&1
           local status="$?"
           if [ "$status" == "0" -o "$status" == "153" ] ; then #0 - is running, 153 - is registered but is not running
             found=true
@@ -46,7 +49,7 @@ function __kill_them_all() {
   local line=""
   for process in $(ls $SERVICE_RUN_DIR -1) ; do
     if [ -n "$process" ] ; then
-      $SERVICE $process status >/dev/null 2>&1
+      PRINT_TO_TTY1="no" $SERVICE $process status >/dev/null 2>&1
       local status="$?"
       if [ "$status" == "0" -o "$status" == "153" ] ; then #0 - is running, 153 - is registered but is not running
         local found=false
@@ -91,7 +94,7 @@ else
   __prev_runlevel="$(runlevel | awk '{print $1}')"
 
   if [ "$__prev_runlevel" != "N" ] ; then
-    echo "Stopping processes"
+    print_msg "Stopping processes"
     __kill_them_all
   fi
   __start_them_all

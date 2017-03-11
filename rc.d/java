@@ -1,6 +1,6 @@
 case "$command_name" in
   start)
-    echo "Preparing JAVA"
+    print_msg "Preparing JAVA"
     echo ':ExecutableJAR:E::jar::/usr/local/bin/jarwrapper:' > /proc/sys/fs/binfmt_misc/register
     
     success

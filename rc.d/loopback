@@ -1,13 +1,13 @@
 case "$command_name" in
   start)
-    echo "Setting up the loopback network device"
+    print_msg "Setting up the loopback network device"
     ip link set up dev lo
     
     register
     success
   ;;
   stop)
-    echo "Setting the loopback network device down"
+    print_msg "Setting the loopback network device down"
     ip link set down dev lo
 
     unregister

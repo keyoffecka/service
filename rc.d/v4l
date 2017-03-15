@@ -1,0 +1,16 @@
+case "$command_name" in
+  start)
+    print_msg "Loading v4l modules"
+    modprobe uvcvideo
+    
+    success
+    register
+  ;;
+  stop)
+    print_msg "Unloading v4l modules"
+    rmmod uvcvideo videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videobuf2_core v4l2_common videodev
+    
+    success
+    unregister
+  ;;
+esac

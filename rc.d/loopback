@@ -3,14 +3,14 @@ case "$command_name" in
     print_msg "Setting up the loopback network device"
     ip link set up dev lo
     
-    register
     success
+    register
   ;;
   stop)
     print_msg "Setting the loopback network device down"
     ip link set down dev lo
 
-    unregister
     success
+    unregister
   ;;
 esac

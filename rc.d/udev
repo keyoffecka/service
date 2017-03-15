@@ -1,7 +1,18 @@
-function udev_wait() {
-  local pid=$(pidof udevd 2>/dev/null)
-  if [ -n "$pid" ] ; then
-    check_process_running $pid
+function udev__wait() {
+  local pid=`pidof udevd 2>/dev/null`
+  if [ -z "$pid" ] ; then
+    print_msg "No UDEV daemon is running"
+    success "-1"
+  else
+    try_stop_process 15 "$pid"
+    
+    if [ "$ret_val" == "0" ] ; then
+      print_msg "Failed to stop the UDEV daemon"
+      success "-2"
+    else
+      print_msg "UDEV daemon has been stopped successfully"
+      success
+    fi
   fi
 }
 
@@ -17,10 +28,13 @@ case "$command_name" in
     udevadm settle
     
     success
+    register
   ;;
   stop)
-    udevadm control -e
-
+    print_msg "Stopping the UDEV daemon"
+    
     udev__wait
+    
+    unreister
   ;;
 esac

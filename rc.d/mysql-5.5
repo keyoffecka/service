@@ -1,13 +1,14 @@
-MYSQL__PIDFILE=/run/mysqld/`/bin/hostname`.pid
-MYSQL__PREFIX=/opt/mysql-5.7.10
+MYSQL55__VERSION=5.5.54
+MYSQL55__PIDFILE=/run/mysqld-$MYSQL55__VERSION/`/bin/hostname`.pid
+MYSQL55__PREFIX=/opt/mysql-$MYSQL55__VERSION
 
 function mysql__stop_mysql() {
   print_msg "Stopping MySQL"
       
   local __ret_val="0"
   
-  if [ -r "$MYSQL__PIDFILE" ] ; then
-    local __pid="$(cat $MYSQL__PIDFILE)"
+  if [ -r "$MYSQL55__PIDFILE" ] ; then
+    local __pid="$(cat $MYSQL55__PIDFILE)"
     if ps --pid $__pid | grep -q mysqld ; then
       kill -s 15 "$__pid"
       __ret_val="$?"
@@ -17,7 +18,7 @@ function mysql__stop_mysql() {
 
         kill -s 0 $__pid 2>/dev/null
         __ret_val="$?"
-        while [ \( "$i" -lt "$TRY" \) -a \( \( "$__ret_val" == "0" \) -o \( -f "$MYSQL__PIDFILE" \) \) ] ; do
+        while [ \( "$i" -lt "$TRY" \) -a \( \( "$__ret_val" == "0" \) -o \( -f "$MYSQL55__PIDFILE" \) \) ] ; do
           sleep $TIMEOUT
           kill -s 0 $__pid 2>/dev/null
           __ret_val="$?"
@@ -32,17 +33,17 @@ function mysql__stop_mysql() {
         fi
       fi
     else
-      rm -f "$MYSQL__PIDFILE"
-      if [ -f "$MYSQL__PIDFILE" ]; then
-        print_msg "MySQL wasn't running, but failed to delete orphan $MYSQL__PIDFILE"
+      rm -f "$MYSQL55__PIDFILE"
+      if [ -f "$MYSQL55__PIDFILE" ]; then
+        print_msg "MySQL wasn't running, but failed to delete orphan $MYSQL55__PIDFILE"
         __ret_val=-13
       else
-        print_msg "$MYSQL__PIDFILE existed, but MySQL daemon wasn't running"
+        print_msg "$MYSQL55__PIDFILE existed, but MySQL daemon wasn't running"
         __ret_val=-12
       fi
     fi
   else
-    print_msg "No $MYSQL__PIDFILE found"
+    print_msg "No $MYSQL55__PIDFILE found"
     __ret_val=-11
   fi
   
@@ -57,38 +58,38 @@ function mysql__start_mysql() {
   print_msg "Starting MySQL"
 
   # Make sure the mysql user can create a socket
-  mkdir -p `dirname $MYSQL__PIDFILE`
-  chown mysql:mysql `dirname $MYSQL__PIDFILE`
-  chmod 0775 `dirname $MYSQL__PIDFILE`
+  mkdir -p `dirname $MYSQL55__PIDFILE`
+  chown mysql:mysql `dirname $MYSQL55__PIDFILE`
+  chmod 0775 `dirname $MYSQL55__PIDFILE`
 
   local __ret_val="0"
-  if [ -r "$MYSQL__PIDFILE" ] ; then
-    local __pid="$(cat $MYSQL__PIDFILE)"
+  if [ -r "$MYSQL55__PIDFILE" ] ; then
+    local __pid="$(cat $MYSQL55__PIDFILE)"
     if ps --pid "$__pid" | grep -q mysqld ; then
       print_msg "MySQL $__pid is already running!"
       __ret_val=-2
     else
-      rm -f "$MYSQL__PIDFILE"
-      if [ -f "$MYSQL__PIDFILE" ]; then
-         print_msg "Failed to delete $MYSQL__PIDFILE"
+      rm -f "$MYSQL55__PIDFILE"
+      if [ -f "$MYSQL55__PIDFILE" ]; then
+         print_msg "Failed to delete $MYSQL55__PIDFILE"
          __ret_val=-3
       fi
     fi
   fi
 
   if [ "$__ret_val" == "0" ] ; then
-    $MYSQL__PREFIX/bin/mysqld_safe --defaults-file=/etc/mysql/my.cnf --pid-file=$MYSQL__PIDFILE --user=mysql 2>&1 >/dev/null &
+    $MYSQL55__PREFIX/bin/mysqld_safe --defaults-file=/etc/mysql-$MYSQL55__VERSION/my.cnf --pid-file=$MYSQL55__PIDFILE --user=mysql 2>&1 >/dev/null &
 
     local i=0
-    while [ \( "$i" -lt "$TRY" \) -a \( ! -f "$MYSQL__PIDFILE" \) ] ; do
+    while [ \( "$i" -lt "$TRY" \) -a \( ! -f "$MYSQL55__PIDFILE" \) ] ; do
       sleep $TIMEOUT
       i=$[i+1]
     done
     
-    if [ -f "$MYSQL__PIDFILE" ] ; then
-      register `cat $MYSQL__PIDFILE`
+    if [ -f "$MYSQL55__PIDFILE" ] ; then
+      register `cat $MYSQL55__PIDFILE`
     else
-      print_msg "MySQL reported successful start, but $MYSQL__PIDFILE yet hasn't been created"
+      print_msg "MySQL reported successful start, but $MYSQL55__PIDFILE yet hasn't been created"
       __ret_val=-1
     fi
   fi
@@ -107,7 +108,7 @@ case "$1" in
 
   reload)
     print_msg "Reloading MySQL daemon"
-    kill -s HUP  `cat ${MYSQL__PIDFILE}`
+    kill -s HUP  `cat ${MYSQL55__PIDFILE}`
     success "$?"
   ;;
 

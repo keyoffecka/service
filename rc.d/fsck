@@ -7,17 +7,7 @@ case "$command_name" in
     if [ "$ret_val" != "0" ] ; then
       print_msg "File systems with errors were found"
 
-      fsck -T -A -r -s
-      success "$?"
-    fi
-
-    if [ "$ret_val" != "0" ] ; then
-      if [ -a "$ret_val" == "1" ] ; then
-        print_msg "All errors were corrected"
-      else
-        print_msg "There were severe errors. Cannot continue."
-        reboot -f
-      fi
+      init S
     fi
 
     success

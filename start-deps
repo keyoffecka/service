@@ -9,6 +9,7 @@ mount
 tmp
 modules
 loopback
+cgroups
 
 keyboard
 java
@@ -16,6 +17,8 @@ wifi
 dhclient
 dbus
 mysql
+mysql-5.5
+docker
 alsa
 X
 

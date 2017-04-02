@@ -1,0 +1,48 @@
+function cgroups__mount() {
+  local sys=""
+
+  mount -t tmpfs -o uid=0,gid=0,mode=0755 cgroup /sys/fs/cgroup
+  success "$?"
+  register
+  
+  if [ "$ret_val" == "0" ] ; then
+    for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
+      mkdir -p /sys/fs/cgroup/$sys
+      if ! mount -n -t cgroup -o $sys cgroup /sys/fs/cgroup/$sys ; then
+        rm -r /sys/fs/cgroup/$sys || true
+      fi
+    done
+  else
+    echo "Failed to mount CGroups"
+  fi
+}
+
+function cgroups__umount() {
+  for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
+    if umount /sys/fs/cgroup/$sys; then
+      rm -r /sys/fs/cgroup/$sys || true
+    fi
+  done
+
+  umount /sys/fs/cgroup
+  success "$?"
+  
+  if [ "$ret_val" == "0" ] ; then
+    unregister
+  else
+    echo "Failed to unmount CGroups"
+  fi
+}
+
+case "$command_name" in
+  start)
+    print_msg "Mounting CGroups file systems"
+    
+    cgroups__mount
+  ;;
+  stop)
+    print_msg "Unmounting CGroups file systems"
+    
+    cgroups__umount
+  ;;
+esac

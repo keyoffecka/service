@@ -68,9 +68,14 @@ if [ "$ret_val" == "undefined" ] ; then
   elif [ "$command_name" == "status" ] ; then
     if [ -f "$SERVICE_RUN_DIR/$service_name" ]; then
       pid=`cat "$SERVICE_RUN_DIR/$service_name"`
-      if [ "`ps --pid $pid | wc -l`" -gt "1" ]  ; then
-         print_msg "Process $pid of $service_name is running!"
-         success
+      if [ -n "$pid" ] ; then
+        if [ "`ps --pid $pid | wc -l`" -gt "1" ]  ; then
+           print_msg "Process $pid of $service_name is running!"
+           success
+         else
+           print_msg "Process $pid of $service_name is registered but is not running"
+           success "-103"
+         fi
        else
          print_msg "Process $pid of $service_name is registered but is not running"
          success "-103"

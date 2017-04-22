@@ -35,6 +35,6 @@ case "$command_name" in
     
     udev__wait
     
-    unreister
+    unregister
   ;;
 esac

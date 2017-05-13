@@ -1,0 +1,8 @@
+case "$command_name" in
+  start)
+    print_msg "Starting the mail box server"
+    dovecot
+    success "$?"
+    register_process_by_name dovecot
+  ;;
+esac

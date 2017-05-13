@@ -1,5 +1,7 @@
 X
 alsa
+mta
+mailbox
 docker
 mysql
 mysql-5.5

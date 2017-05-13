@@ -19,6 +19,8 @@ dbus
 mysql
 mysql-5.5
 docker
+mailbox
+mta
 alsa
 X
 

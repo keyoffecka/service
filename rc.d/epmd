@@ -1,0 +1,8 @@
+case "$command_name" in
+  start)
+    print_msg "Starting the EPM daemon"
+    sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-17.5/bin HOME=/var/lib/couchdb /opt/erlang-17.5/bin/epmd -daemon"
+    register_process_by_name epmd
+    success "$?"
+  ;;
+esac

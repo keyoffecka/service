@@ -18,6 +18,8 @@ dhclient
 dbus
 mysql
 mysql-5.5
+epmd
+couchdb
 docker
 mailbox
 mta

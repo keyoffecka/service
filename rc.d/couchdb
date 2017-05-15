@@ -1,8 +1,14 @@
 case "$command_name" in
   start)
     print_msg "Starting the CouchDB server"
-    sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-17.5/bin HOME=/var/lib/couchdb /opt/couchdb-2.0.0/bin/couchdb >/var/log/couchdb.log 2>&1 &"
-    register_process_by_name beam.smp
-    success "$?"
+    
+    if [ -z "`pidof epmd`" ] ; then
+      print_msg "EPMD is not running"
+      success -1
+    else
+      sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-17.5/bin HOME=/var/lib/couchdb /opt/couchdb-2.0.0/bin/couchdb >/var/log/couchdb.log 2>&1 &"
+      register_process_by_name beam.smp
+      success "$?"
+    fi
   ;;
 esac

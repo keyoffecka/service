@@ -1,11 +1,39 @@
 source /etc/sysconfig/network
 
+function dhclient__check_iface_exists() {
+  local __ret_val="-1"
+  local i="0"
+  while [ "$i" -lt "$TRY" -a "$__ret_val" != "0" ] ; do
+    sleep $TIMEOUT
+    ip link | grep -q $NETWORK__IFACE
+    __ret_val="$?"
+    i=$[i+1]
+  done
+  
+  return $__ret_val
+}
+
+
 case $command_name in
   start)
-    print_msg "Starting the DHCP client"
-    dhclient -nw $NETWORK__IFACE -pf /run/dhclient
-    success "$?"
-    register "$(cat /run/dhclient)"
+    modprobe $NETWORK__MODULE
+
+    print_msg "Waiting for $NETWORK__IFACE to appear"
+    dhclient__check_iface_exists
+    
+    if [ "$?" == "0" ] ; then
+      print_msg "Starting the DHCP client"
+    
+      dhclient -nw $NETWORK__IFACE -pf /run/dhclient
+      success "$?"
+
+      if [ "$ret_val" == "0" ] ; then
+        register "$(cat /run/dhclient)"
+      fi
+    else
+      print_msg "Interface $NETWORK__IFACE is missing"
+      success "-1"
+    fi
   ;;
   stop)
     print_msg "Stopping the DHCP client"

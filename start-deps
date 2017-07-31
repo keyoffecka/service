@@ -15,6 +15,7 @@ keyboard
 java
 wifi
 dhclient
+vpn
 dbus
 mysql
 mysql-5.5

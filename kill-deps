@@ -9,6 +9,7 @@ epmd
 mysql
 mysql-5.5
 dbus
+vpn
 dhclient
 wifi
 java

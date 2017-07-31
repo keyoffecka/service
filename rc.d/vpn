@@ -1,0 +1,47 @@
+source /etc/sysconfig/network
+
+case $command_name in
+  start)
+    vpn_running="1"
+    if [ -f "$SERVICE_RUN_DIR/$service_name" ] ; then
+      kill -s 0 "$(cat "$SERVICE_RUN_DIR/$service_name")" 2>/dev/null
+      vpn_running="$?"
+    fi
+    
+    if [ "$vpn_running" == "0" ] ; then
+      print_msg "The VPN client is already running"
+      
+      success 1
+    else
+      print_msg "Starting the VPN client"
+      
+      modprobe tun
+      
+      nohup /usr/bin/openvpn /etc/openvpn/client/client.conf >/var/log/openvpn.log 2>&1 &
+      vpn__pid=$!
+      
+      check_process_running $vpn__pid
+      success $?
+      
+      if [ "$ret_val" == "0" ] ; then
+        register $vpn__pid
+        print_msg "The VPN client started normally"
+        
+        ip route add $NETWORK__VPN_SERVER_IP via $NETWORK__VPN_GATEWAY_IP
+        ip route del default
+        ip route add default via $NETWORK__VPN_SERVER_TUN_IP
+      else
+        print_msg "The VPN client failed to start"
+      fi
+    fi
+  ;;
+  stop)
+    __stop_process
+    success $?
+    
+    if [ "$ret_val" == "0" ] ; then
+      ip route add default via $NETWORK__VPN_GATEWAY_IP
+      ip route del $NETWORK__VPN_SERVER_IP via $NETWORK__VPN_GATEWAY_IP
+    fi
+  ;;
+esac

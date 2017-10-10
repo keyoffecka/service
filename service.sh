@@ -8,7 +8,7 @@ command_name="$2"
 
 function __stop_process() {
   local __pid="`cat "$SERVICE_RUN_DIR/$service_name"`"
-  
+
   print_msg "Trying to stop $__pid of $service_name gracefully"
   try_stop_process 15 "$__pid"
   local __ret_val="$?"
@@ -18,7 +18,7 @@ function __stop_process() {
     try_stop_process 9 "$__pid"
     local __ret_val="$?"
   fi
-  
+
   if [ "$__ret_val" == "0" ] ; then
     print_msg "Failed to stop $__pid of $service_name"
     __ret_val="-121"
@@ -28,7 +28,7 @@ function __stop_process() {
 
     __ret_val="0"
   fi
-  
+
   return $__ret_val
 }
 
@@ -42,6 +42,11 @@ fi
 if [ "$#" != "2" ] ; then
   print_msg "Wrong argument number"
   exit -127
+fi
+
+if [ ! -r "$SERVICE_DIR/$service_name" ] ; then
+  print_msg "$service_name is unknown"
+  exit -125
 fi
 
 ret_val="undefined"

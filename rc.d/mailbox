@@ -3,6 +3,6 @@ case "$command_name" in
     print_msg "Starting the mail box server"
     dovecot
     success "$?"
-    register_process_by_name dovecot
+    register dovecot
   ;;
 esac

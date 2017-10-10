@@ -30,10 +30,10 @@ function __start_them_all() {
       fi
     fi
   done < $RC_DIR/rc$__curent_runlevel
-  
+
   while read line ; do
     if [ -n "$line" ] ; then
-      for process in ${processes_to_start[@]} ; do 
+      for process in ${processes_to_start[@]} ; do
         if [ "$line" == "$process" ] ; then
           $SERVICE $process start
           break;
@@ -59,17 +59,17 @@ function __kill_them_all() {
             break;
           fi
         done < $RC_DIR/rc$__curent_runlevel
-        
+
         if ! $found ; then
           processes_to_kill+=($process)
         fi
       fi
     fi
   done
-  
+
   while read line ; do
     if [ -n "$line" ] ; then
-      for process in ${processes_to_kill[@]} ; do 
+      for process in ${processes_to_kill[@]} ; do
         if [ "$line" == "$process" ] ; then
           $SERVICE $process stop
           break;
@@ -90,7 +90,7 @@ function __start_rc_sysinit() {
 
 if [ "$__curent_runlevel" == "sysinit" ] ; then
   __start_rc_sysinit
-else   
+else
   __prev_runlevel="$(runlevel | awk '{print $1}')"
 
   if [ "$__prev_runlevel" != "N" ] ; then

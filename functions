@@ -8,39 +8,46 @@ function print_msg() {
 }
 
 function register() {
+  local __ret_val="0"
+
   if [ -z "${1:-}" ] ; then
     touch "$SERVICE_RUN_DIR/$service_name"
-  else
+    __ret_val=$?
+  elif [[ "$1" =~ ^[0-9]+$ ]] ; then
     echo "$1" > "$SERVICE_RUN_DIR/$service_name"
-  fi
-}
-
-function register_process_by_name() {
-  local __pid="`pidof "$1"`"
-  local __ret_val="0"
-  
-  local i=0
-  while [ "$i" -lt "$TRY" -a -z "$__pid" ] ; do
-    sleep $TIMEOUT
-    __pid="`pidof "$1"`"
-    __ret_val="$?"
-    i=$[i+1]
-  done
-
-  if [ -n "$__pid" ] ; then
-    print_msg "Found $__pid of $1 of $service_name"
-    register "$__pid"
+    __ret_val=$?
   else
-    __ret_val="-125"
-    print_msg "No process $1 found"
+    local __pid="`pidof "$1"`"
+
+    local i=0
+    while [ "$i" -lt "$TRY" -a -z "$__pid" ] ; do
+      sleep $TIMEOUT
+      __pid="`pidof "$1"`"
+      __ret_val="$?"
+      i=$[i+1]
+    done
+
+    if [ -n "$__pid" ] ; then
+      print_msg "Found $__pid of $1 of $service_name"
+      register "$__pid"
+    else
+      __ret_val="-124"
+      print_msg "No process $1 found"
+    fi
   fi
-  
+
   return $__ret_val
 }
 
 function unregister() {
-  rm "$SERVICE_RUN_DIR/$service_name"
-  return "$?"
+  rm "$SERVICE_RUN_DIR/$service_name" 2>/dev/null
+  local __ret_val=$?
+
+  if [ "$__ret_val" != "0" ] ; then
+    print_msg "PID file $SERVICE_RUN_DIR/$service_name not found";
+  fi
+
+  return $__ret_val
 }
 
 function success() {
@@ -49,7 +56,7 @@ function success() {
 
 function check_process_running() {
   local __pid="$1"
-  
+
   kill -s 0 "$__pid" 2>/dev/null
   local __ret_val="$?"
   local i="0"
@@ -59,14 +66,14 @@ function check_process_running() {
     __ret_val="$?"
     i=$[i+1]
   done
-  
+
   return $__ret_val
 }
 
 function try_stop_process() {
   local __signal="$1"
   local __pid="$2"
-  
+
   kill -s "$__signal" "$__pid" 2>/dev/null
   kill -s 0 "$__pid" 2>/dev/null
   local __ret_val="$?"
@@ -78,6 +85,6 @@ function try_stop_process() {
     __ret_val="$?"
     i=$[i+1]
   done
-  
+
   return $__ret_val
 }

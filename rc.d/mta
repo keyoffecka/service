@@ -3,6 +3,6 @@ case "$command_name" in
     print_msg "Starting the SMTP server"
     postfix start
     success "$?"
-    register_process_by_name master
+    register master
   ;;
 esac

@@ -7,7 +7,7 @@ case "$command_name" in
       success -1
     else
       sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-17.5/bin HOME=/var/lib/couchdb /opt/couchdb-2.0.0/bin/couchdb >/var/log/couchdb.log 2>&1 &"
-      register_process_by_name beam.smp
+      register beam.smp
       success "$?"
     fi
   ;;

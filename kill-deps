@@ -20,3 +20,4 @@ loopback
 logger
 udev
 kernel-console-log
+swap

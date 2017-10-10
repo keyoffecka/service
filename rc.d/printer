@@ -3,6 +3,6 @@ case "$command_name" in
     print_msg "Starting the printing server"
     cupsd
     success "$?"
-    register_process_by_name cupsd
+    register cupsd
   ;;
 esac

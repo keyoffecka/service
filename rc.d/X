@@ -7,7 +7,7 @@ case "$command_name" in
     rm /tmp/.X0-lock 2>/dev/null
     exec su -c 'env XAUTHORITY=$HOME/.Xauthority xinit /usr/share/X11/app-defaults/xinitrc -- :0 -auth $HOME/.auth -nolisten tcp vt7 >~/.xinit.log 2>&1' - "$X__USER" &
 
-    register_process_by_name Xorg
+    register Xorg
     success "$?"
   ;;
 esac

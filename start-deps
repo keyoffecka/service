@@ -6,6 +6,7 @@ remount-root
 logger
 udev
 mount
+swap
 tmp
 modules
 loopback

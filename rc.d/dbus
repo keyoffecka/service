@@ -3,6 +3,7 @@ case "$command_name" in
     print_msg "Starting D-BUS daemon"
 
     mkdir -p /run/dbus
+    chown -R messagebus:messagebus /run/dbus
     rm /run/dbus/pid 2>/dev/null
     dbus-daemon --config-file=/usr/share/dbus-1/system.conf
     success "$?"

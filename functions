@@ -52,6 +52,7 @@ function unregister() {
 
 function success() {
   ret_val="${1:-0}"
+  return "$ret_val"
 }
 
 function check_process_running() {

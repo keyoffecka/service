@@ -1,0 +1,14 @@
+source /etc/sysconfig/bluez-alsa
+
+case "$command_name" in
+  start)
+    print_msg "Setting up the Bluetooth ALSA support for $BLUEZ_ALSA__HCI_DEVICE"
+
+    nohup /usr/bin/bluealsa -i $BLUEZ_ALSA__HCI_DEVICE --disable-hsp >/dev/null 2>&1 &
+    if success "$?" ; then
+      register $!
+    else
+      print_msg "Failed to start the Bluez ALSA daemon"
+    fi
+  ;;
+esac

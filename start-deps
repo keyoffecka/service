@@ -26,6 +26,8 @@ docker
 mailbox
 mta
 alsa
+bluez
+bluez-alsa
 printer
 X
 

@@ -17,11 +17,13 @@ java
 wifi
 dhclient
 vpn
+aa-vpn
 dbus
 mysql
 mysql-5.5
 epmd
 couchdb
+rabbitmq
 docker
 mailbox
 mta

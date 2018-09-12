@@ -1,0 +1,27 @@
+case "$command_name" in
+  start)
+    print_msg "Starting the RabbitMQ server"
+    
+    if [ -z "`pidof epmd`" ] ; then
+      print_msg "EPMD is not running"
+      success -1
+    else
+      sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-20.2/bin HOME=/var/lib/couchdb /opt/rabbitmq_server-3.7.2/sbin/rabbitmq-server >/var/log/rabbitmq.log 2>&1 &"
+      register beam.smp
+      success "$?"
+    fi
+  ;;
+  
+  stop)
+    sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-20.2/bin HOME=/var/lib/couchdb /opt/rabbitmq_server-3.7.2/sbin/rabbitmqctl status >/dev/null 2>&1"
+    success "$?"
+    
+    if [ "$ret_val" == "0" ] ; then
+      sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-20.2/bin HOME=/var/lib/couchdb /opt/rabbitmq_server-3.7.2/sbin/rabbitmqctl stop"
+      unregister
+      success "$?"
+    else
+      print_smg "RabbitMQ is not running"
+    fi
+  ;;
+esac

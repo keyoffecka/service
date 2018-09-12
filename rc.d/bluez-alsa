@@ -4,11 +4,18 @@ case "$command_name" in
   start)
     print_msg "Setting up the Bluetooth ALSA support for $BLUEZ_ALSA__HCI_DEVICE"
 
-    nohup /usr/bin/bluealsa -i $BLUEZ_ALSA__HCI_DEVICE --disable-hsp >/dev/null 2>&1 &
-    if success "$?" ; then
-      register $!
+    pidof bluealsa >/dev/null
+    if [ "$?" == "0" ] ; then
+      print_msg "Bluetooth ALSA daemon is already running"
+      
+      success -1
     else
-      print_msg "Failed to start the Bluez ALSA daemon"
+      nohup /usr/bin/bluealsa -i $BLUEZ_ALSA__HCI_DEVICE --disable-hsp >/dev/null 2>&1 &
+      if success "$?" ; then
+        register $!
+      else
+        print_msg "Failed to start the Bluez ALSA daemon"
+      fi
     fi
   ;;
 esac

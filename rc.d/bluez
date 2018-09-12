@@ -5,8 +5,15 @@ case "$command_name" in
     modprobe ath3k
     modprobe btusb
     
-    nohup /usr/bin/bluetoothd >/dev/null 2>&1 &
-    success "$?"
-    [ "$ret_val" == "0" ] && register $!
+    pidof bluetoothd >/dev/null
+    if [ "$?" == "0" ] ; then
+      print_msg "Bluetooth daemons is already running"
+
+      success "-1"
+    else
+      nohup /usr/bin/bluetoothd >/dev/null 2>&1 &
+      success "$?"
+      [ "$ret_val" == "0" ] && register $!
+    fi
   ;;
 esac

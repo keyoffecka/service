@@ -6,7 +6,7 @@ case "$command_name" in
       print_msg "EPMD is not running"
       success -1
     else
-      sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-17.5/bin HOME=/var/lib/couchdb /opt/couchdb-2.0.0/bin/couchdb >/var/log/couchdb.log 2>&1 &"
+      sudo -u couchdb bash -c "env PATH=$PATH:/opt/erlang-20.2/bin HOME=/var/lib/couchdb /opt/couchdb-2.0.0/bin/couchdb >/var/log/couchdb.log 2>&1 &"
       register beam.smp
       success "$?"
     fi

@@ -6,11 +6,13 @@ printer
 mta
 mailbox
 docker
+rabbitmq
 couchdb
 epmd
 mysql
 mysql-5.5
 dbus
+aa-vpn
 vpn
 dhclient
 wifi

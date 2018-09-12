@@ -24,7 +24,7 @@ case $command_name in
     if [ "$?" == "0" ] ; then
       print_msg "Starting the DHCP client"
     
-      dhclient -nw $NETWORK__IFACE -pf /run/dhclient
+      dhclient -nw -pf /run/dhclient -cf /etc/dhcp/dhclient.conf $NETWORK__IFACE
       success "$?"
 
       if [ "$ret_val" == "0" ] ; then

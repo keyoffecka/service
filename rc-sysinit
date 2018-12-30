@@ -3,9 +3,10 @@ primary-mount
 fsck
 hostname
 remount-root
-logger
+sysctl
 udev
 mount
+logger
 swap
 tmp
 modules

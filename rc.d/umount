@@ -3,7 +3,7 @@ case "$command_name" in
     print_msg "Unmounting file systems"
     umount -a -d -r -t notmpfs,nosysfs,nodevtmpfs,noproc,nodevpts
     success "$?"
-    
+
     mount -o remount,ro /
   ;;
 esac

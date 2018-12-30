@@ -1,0 +1,64 @@
+function httpd__start() {
+  print_msg "Starting the HTTP server"
+    
+  local __ret_val="0"
+  local __pid=$(cat /run/httpd/httpd.pid 2>/dev/null)
+  
+  if [ -z "$__pid" ] ; then
+    if [ ! -d "/run/httpd" ] ; then
+      print_msg "Creating the HTTP server run dir"
+      install -g http -o http -m0750 -d /run/httpd
+    fi
+    
+    sudo -u http /opt/httpd-2.4.37/bin/httpd >/dev/null 2>&1
+
+    local i="0"
+    while [ "$i" -lt "$TRY" -a -z "$__pid" ] ; do
+      sleep $TIMEOUT
+      __pid=$(cat /run/httpd/httpd.pid 2>/dev/null)
+      i=$[i+1]
+    done
+    if [ -n "$__pid" ] ; then
+      print_msg "Started the HTTP server with PID $__pid"
+      
+      register "$__pid"
+    else
+      print_msg "Timeout waiting for the HTTP server to start"
+      __ret_val="-2"
+    fi
+  else
+    print_msg "The HTTP server with PID $__pid is already running!"
+    __ret_val="-1"
+  fi
+
+  return "$__ret_val"
+}
+
+function httpd__stop() {
+  local __ret_val="0"
+
+  local __pid=$(cat /run/httpd/httpd.pid 2>/dev/null)
+  
+  if [ -z "$__pid" ] ; then
+    print_msg "The HTTP server is not running"
+    __ret_val="-1"
+  else
+    print_msg "Stopping the HTTP server with PID $__pid"
+    kill -s 15 $__pid
+    __ret_val="$?"
+    unregister
+  fi
+
+  return "$__ret_val"
+}
+
+case "$command_name" in
+  start)
+    httpd__start
+    success "$?"
+  ;;
+  stop)
+    httpd__stop
+    success "$?"
+  ;;
+esac

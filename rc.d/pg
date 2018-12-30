@@ -1,0 +1,71 @@
+PG__EXE=/opt/postgresql-11.1/bin/pg_ctl
+PG__DATA=/mnt/osm/data
+PG__LOG=/var/log/postgres.log
+PG__RUN=/run/postgresql
+
+function pg__get_pid() {
+  echo "`sudo -u postgres $PG__EXE -D $PG__DATA status | grep 'PID' | sed -r 's,.*\(PID\:\s*(.+)\),\1,' 2>/dev/null`"
+}
+
+function pg__start_postgresql() {
+  print_msg "Starting the PostgreSQL server"
+    
+  local __ret_val="0"
+  local __pid=$(pg__get_pid)
+  
+  if [ -z "$__pid" ] ; then
+    if [ ! -d "$PG__RUN" ] ; then
+      print_msg "Creating the PostgreSQL run dir"
+      install -g postgres -o postgres -m0750 -d $PG__RUN
+    fi
+    
+    touch $PG__LOG
+    chown postgres:postgres $PG__LOG
+    chmod 0644 $PG__LOG
+    
+    sudo -u postgres $PG__EXE -D $PG__DATA -l $PG__LOG start >/dev/null
+    __ret_val="$?"
+    if [ "$__ret_val" == "0" ]; then
+      __pid=$(pg__get_pid)
+      print_msg "Started the PostgreSQL with PID $__pid"
+      
+      register "$__pid"
+    else
+      print_msg "Failed to start PostgreSQL server"
+    fi
+  else
+    print_msg "PostgreSQL with PID $__pid is already running!"
+    __ret_val="-1"
+  fi
+
+  return "$__ret_val"
+}
+
+function pg__stop_postgresql() {
+  local __ret_val="0"
+
+  local __pid=$(pg__get_pid)
+  
+  if [ -z "$__pid" ] ; then
+    print_msg "PostgreSQL is not running"
+    __ret_val="-1"
+  else
+    print_msg "Stopping PostgreSQL with PID $__pid"
+    sudo -u postgres $PG__EXE -D $PG__DATA stop >/dev/null
+    __ret_val="$?"
+    unregister
+  fi
+
+  return "$__ret_val"
+}
+
+case "$command_name" in
+  start)
+    pg__start_postgresql
+    success "$?"
+  ;;
+  stop)
+    pg__stop_postgresql
+    success "$?"
+  ;;
+esac

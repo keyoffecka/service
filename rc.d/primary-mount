@@ -24,10 +24,7 @@ case "$command_name" in
       mkfifo /dev/initctl
     fi
     kill -s SIGUSR1 1
-    
-    print_msg "Creating utmp"
-    touch /var/run/utmp
-    
+
     success
   ;;
 esac

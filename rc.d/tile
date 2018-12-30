@@ -1,0 +1,59 @@
+function tile__start() {
+  print_msg "Starting the tile server"
+    
+  local __ret_val="0"
+  local __pid=$(pidof renderd)
+  
+  if [ -z "$__pid" ] ; then
+    if [ ! -d "/run/renderd" ] ; then
+      print_msg "Creating the tile server run dir"
+      install -g http -o http -m0750 -d /run/renderd
+    fi
+
+    sudo -u http renderd
+    __ret_val="$?"
+
+    if [ "$__ret_val" == "0" ]; then
+      __pid=$(pidof renderd)
+      print_msg "Started the tile server with PID $__pid"
+      
+      register "$__pid"
+    else
+      print_msg "Failed to start the tile server"
+    fi
+  else
+    print_msg "The tile server with PID $__pid is already running!"
+    __ret_val="-1"
+  fi
+
+  return "$__ret_val"
+}
+
+function tile__stop() {
+  local __ret_val="0"
+
+  local __pid=$(pidof renderd)
+  
+  if [ -z "$__pid" ] ; then
+    print_msg "The tile server is not running"
+    __ret_val="-1"
+  else
+    print_msg "Stopping the tile server with PID $__pid"
+    kill -s 15 $__pid
+    __ret_val="$?"
+    unregister
+  fi
+
+  return "$__ret_val"
+}
+
+case "$command_name" in
+  start)
+    tile__start
+    success "$?"
+  ;;
+  stop)
+    tile__stop
+    success "$?"
+  ;;
+esac

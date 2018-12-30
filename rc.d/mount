@@ -2,6 +2,10 @@ case "$command_name" in
   start)
     print_msg "Mounting remaining file systems"
     mount -a
+
+    print_msg "Creating utmp"
+    touch /var/run/utmp
+
     success "$?"
   ;;
 esac

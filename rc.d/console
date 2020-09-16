@@ -1,0 +1,18 @@
+source /etc/sysconfig/console
+
+case "$command_name" in
+  start)
+    print_msg "Setting up the console"
+    
+    for t in $(seq 1 $CONSOLE__TTY_COUNT) ; do
+      setfont -C /dev/tty$t $CONSOLE__FONT_FILE
+      loadkeys -C /dev/tty$t $CONSOLE__KEYBOARD_FILE
+    done
+    
+    success
+    register
+  ;;
+  stop)
+    unregister
+  ;;
+esac

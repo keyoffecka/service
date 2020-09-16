@@ -1,15 +1,38 @@
+source /etc/sysconfig/tmp
+
 case "$command_name" in
   start)
-    print_msg "Cleaning up /tmp"
+    print_msg "Setting up $TMP__MOUNT_PATH"
 
-    pushd /tmp >/dev/null
-    rm -fr *
-    rm -fr .* 2>/dev/null
-    popd >/dev/null
+    if [ -z "$TMP__MOUNT_PATH" ] ; then
+      success 1
+    elif [ -z "$TMP__DEVICE" ] ; then
+      success 2
+    else
+      __TMP__LINE=$(awk '{print $2}' /etc/fstab | grep -n "$TMP__MOUNT_PATH" | cut -f1 -d:)
+      if [ -z "$__TMP__LINE" ] ; then
+        print_msg "Temp FS [$TMP__MOUNT_PATH] definition not found in /etc/fstab"
+        success 3
+      elif awk '{print $1}' /etc/fstab | head -n$__TMP__LINE | tail -n1 | grep -q "^$TMP__DEVICE\$" ; then
+        if [ "${TMP__AGGRESIVE:-no}" == "yes" ] ; then
+          mkfs -t ext2 -q -L tmp $TMP__DEVICE
+          mount $TMP__DEVICE
+          chmod 1777 $TMP__MOUNT_PATH
+        else
+          pushd /tmp >/dev/null
+          rm -fr *
+          rm -fr .* 2>/dev/null
+          popd >/dev/null
+        fi
 
-    install -d -m 1777 /tmp/.ICE-unix
-    install -d -m 1777 /tmp/.X11-unix
-    
-    success
+        install -d -m 1777 /tmp/.ICE-unix
+        install -d -m 1777 /tmp/.X11-unix
+
+        success
+      else
+        print_msg "Expected $TMP__DEVICE at line $__TMP__LINE in /etc/fstab"
+        success 4
+      fi
+    fi
   ;;
 esac

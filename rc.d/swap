@@ -1,16 +1,17 @@
 case "$command_name" in
   start)
     print_msg "Setting up the disk swap"
-    swapon -a -v
+    swapon -a -v >/dev/null
     success "$?"
-    
+
     if [ "$ret_val" == "0" ] ; then
       register
     fi
   ;;
+
   stop)
     print_msg "Setting down the disk swap"
-    
+
     swapoff -a -v
     success "$?"
 

@@ -2,7 +2,7 @@ case "$command_name" in
   start)
     print_msg "Starting docker"
     
-    nohup env PATH=$PATH:/opt/docker-1.13.1 /opt/docker-1.13.1/dockerd -H unix:///run/docker.sock --config-file /etc/docker/daemon.json >/var/log/docker.log 2>&1 &
+    nohup env PATH=$PATH:/opt/docker-19.03.9 /opt/docker-19.03.9/dockerd -H unix:///run/docker.sock --config-file /etc/docker/daemon.json >/var/log/docker.log 2>&1 &
 
     register dockerd
     success "$?"

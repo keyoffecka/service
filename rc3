@@ -1,6 +1,9 @@
+console
 java
 wifi
 dhclient
+named
 dbus
 alsa
+pulse
 X

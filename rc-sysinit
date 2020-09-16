@@ -3,11 +3,12 @@ primary-mount
 fsck
 hostname
 remount-root
+logger
+tmp
 sysctl
 udev
 mount
-logger
 swap
-tmp
 modules
 loopback
+keyboard

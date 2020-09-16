@@ -17,7 +17,7 @@ case $command_name in
       
       modprobe tun
       
-      nohup /usr/bin/openvpn /etc/openvpn/client/client.conf >/var/log/openvpn.log 2>&1 &
+      nohup /usr/bin/openvpn /private/prj/works/streamsets/doc/client.ovpn >/var/log/openvpn.log 2>&1 &
       vpn__pid=$!
       
       check_process_running $vpn__pid
@@ -26,10 +26,6 @@ case $command_name in
       if [ "$ret_val" == "0" ] ; then
         register $vpn__pid
         print_msg "The VPN client started normally"
-        
-        ip route add $NETWORK__VPN_SERVER_IP via $NETWORK__VPN_GATEWAY_IP
-        ip route del default
-        ip route add default via $NETWORK__VPN_SERVER_TUN_IP
       else
         print_msg "The VPN client failed to start"
       fi

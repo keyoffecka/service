@@ -25,6 +25,9 @@ case "$command_name" in
     fi
     kill -s SIGUSR1 1
 
+    print_msg "creating utmp"
+    touch /var/run/utmp
+
     success
   ;;
 esac

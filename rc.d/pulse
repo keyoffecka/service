@@ -1,0 +1,14 @@
+case "$command_name" in
+  start)
+    print_msg "Starting pulse"
+    
+    if /opt/pulseaudio-10.0opt/bin/pulseaudio --system --disallow-exit --disallow-module-loading --daemonize >/dev/null 2>&1 ; then
+      register pulseaudio
+      success
+      print_msg "Started pulse successfully"
+    else
+      print_msg "Failed to start pulse"
+      success 1
+    fi
+  ;;
+esac

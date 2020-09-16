@@ -7,5 +7,15 @@ case $command_name in
     wpa_supplicant -W -B -i $NETWORK__IFACE -c $NETWORK__WPA_SUPPLICANT_CONFIG_FILE -P /run/wpa_supplicant
     success "$?"
     register $(cat /run/wpa_supplicant)
+    
+    ip addr add $NETWORK__IFACE_ALIAS_ADDR/$NETWORK__IFACE_ALIAS_MASK brd $NETWORK__IFACE_ALIAS_BRD dev $NETWORK__IFACE
+  ;;
+  stop)
+    __stop_process
+    success $?
+    
+    if [ "$ret_val" == "0" ] ; then
+      ip addr del $NETWORK__IFACE_ALIAS_ADDR/$NETWORK__IFACE_ALIAS_MASK dev $NETWORK__IFACE >/dev/null 2>&1
+    fi
   ;;
 esac

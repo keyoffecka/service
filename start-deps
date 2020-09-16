@@ -12,24 +12,30 @@ modules
 loopback
 cgroups
 
+console
 keyboard
 java
 wifi
 dhclient
+named
 vpn
-aa-vpn
 dbus
 mysql
 mysql-5.5
+pg
+pg-osm
 epmd
 couchdb
 rabbitmq
 docker
+tile
+httpd
 mailbox
 mta
 alsa
 bluez
 bluez-alsa
+pulse
 printer
 X
 

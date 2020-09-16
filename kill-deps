@@ -1,4 +1,5 @@
 X
+pulse
 bluez-alsa
 bluez
 alsa
@@ -6,18 +7,22 @@ printer
 mta
 mailbox
 docker
+httpd
+tile
 rabbitmq
 couchdb
 epmd
 mysql
 mysql-5.5
+pg
 dbus
-aa-vpn
 vpn
+named
 dhclient
 wifi
 java
 keyboard
+console
 
 cgroups
 loopback

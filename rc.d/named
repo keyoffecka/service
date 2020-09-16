@@ -1,0 +1,10 @@
+source /etc/sysconfig/network
+
+case $command_name in
+  start)
+    print_msg "Starting the DNS server"
+    named -4
+    success "$?"
+    register $(cat /run/named/named.pid)
+  ;;
+esac

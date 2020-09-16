@@ -1,5 +1,6 @@
+source /etc/sysconfig/$(basename $BASH_SOURCE)
+
 PG__EXE=/opt/postgresql-11.1/bin/pg_ctl
-PG__DATA=/mnt/osm/data
 PG__LOG=/var/log/postgres.log
 PG__RUN=/run/postgresql
 
@@ -16,14 +17,14 @@ function pg__start_postgresql() {
   if [ -z "$__pid" ] ; then
     if [ ! -d "$PG__RUN" ] ; then
       print_msg "Creating the PostgreSQL run dir"
-      install -g postgres -o postgres -m0750 -d $PG__RUN
+      install -g postgres -o postgres -m0755 -d $PG__RUN
     fi
     
     touch $PG__LOG
     chown postgres:postgres $PG__LOG
     chmod 0644 $PG__LOG
     
-    sudo -u postgres $PG__EXE -D $PG__DATA -l $PG__LOG start >/dev/null
+    sudo -u postgres $PG__EXE -D $PG__DATA -o "-c config_file=$PG__CFG" -l $PG__LOG start >/dev/null
     __ret_val="$?"
     if [ "$__ret_val" == "0" ]; then
       __pid=$(pg__get_pid)
@@ -51,7 +52,7 @@ function pg__stop_postgresql() {
     __ret_val="-1"
   else
     print_msg "Stopping PostgreSQL with PID $__pid"
-    sudo -u postgres $PG__EXE -D $PG__DATA stop >/dev/null
+    sudo -u postgres $PG__EXE -D $PG__DATA -o "-c config_file=$PG__CFG" stop >/dev/null
     __ret_val="$?"
     unregister
   fi

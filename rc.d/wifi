@@ -8,13 +8,15 @@ case $command_name in
     success "$?"
     register $(cat /run/wpa_supplicant)
     
-    ip addr add $NETWORK__IFACE_ALIAS_ADDR/$NETWORK__IFACE_ALIAS_MASK brd $NETWORK__IFACE_ALIAS_BRD dev $NETWORK__IFACE
+    if [ -n "$NETWORK__IFACE_ALIAS_ADDR" ]; then
+      ip addr add $NETWORK__IFACE_ALIAS_ADDR/$NETWORK__IFACE_ALIAS_MASK brd $NETWORK__IFACE_ALIAS_BRD dev $NETWORK__IFACE
+    fi
   ;;
   stop)
     __stop_process
     success $?
     
-    if [ "$ret_val" == "0" ] ; then
+    if [ "$ret_val" == "0" -a -n "$NETWORK__IFACE_ALIAS_ADDR" ] ; then
       ip addr del $NETWORK__IFACE_ALIAS_ADDR/$NETWORK__IFACE_ALIAS_MASK dev $NETWORK__IFACE >/dev/null 2>&1
     fi
   ;;
